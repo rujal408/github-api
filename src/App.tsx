@@ -38,8 +38,8 @@ const  App:React.FC=()=> {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const searchRepository=useCallback(debounce(optimizedFunction),[])
 
-  const handleClick=(v:GitHubRepository)=>{
-      setRepoDetail(v)
+  const handleClick=(repo:GitHubRepository)=>{
+      setRepoDetail(repo)
   }
 
 
@@ -54,6 +54,7 @@ const  App:React.FC=()=> {
             data={data} 
             error={error} 
             onClick={handleClick} />
+            {/* Vertical Border Line */}
            <Stack width="2px" bg="#dbdbdb" minH="100vh"></Stack>
             {/* Repo Detail Section */}
             <RepoDetails repoDetail={repoDetail} />

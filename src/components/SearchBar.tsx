@@ -15,13 +15,12 @@ interface Props{
 const SearchBar: React.FC<Props> =(props) => {
     const [sort, setSort] = useState<Sort>({order:"asc",sort_by:"full_name"})
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [postsPerPage] = useState<number>(4)
+    const [postsPerPage, setPostsPerPage] = useState<number>(10)
 
     // Get current data
-    const indexOfLastPost = currentPage * postsPerPage;
-    const indexOfFirstPost = indexOfLastPost - postsPerPage;
-    const currentPosts = props.data.slice(indexOfFirstPost, indexOfLastPost);
-
+    const startIndex = currentPage * postsPerPage - postsPerPage;
+    const endIndex = startIndex + postsPerPage;
+    const currentPosts = props.data.slice(startIndex, endIndex);
     // Change page
     const paginate = (pageNumber:number) => setCurrentPage(pageNumber);
 
@@ -36,74 +35,73 @@ const SearchBar: React.FC<Props> =(props) => {
     return (
         <Stack 
             flex="1.5"
-            position="relative"
             p="5" 
             display="flex" 
             flexDirection="column" 
             spacing="4"
         >
-                <Input 
-                    placeholder="Username" 
-                    onChange={(e:ChangeEvent<HTMLInputElement>)=>{
-                        props.searchRepository(e.target.value)
-                    }}
-                    _placeholder={{ color: 'white' }}
-                    borderColor="black"
-                />
+            <Input 
+                placeholder="Username" 
+                onChange={(e:ChangeEvent<HTMLInputElement>)=>{
+                    props.searchRepository(e.target.value)
+                }}
+                _placeholder={{ color: 'white' }}
+                borderColor="black"
+            />
             {/* List Repos in Block */}
             {props.error===""?
             <>
             {/* Sort and Pagination If Data Available */}
-                {currentPosts.length>0 && 
-                    <Stack 
-                        display="flex" 
-                        flexDirection="row"
-                        alignItems="center"
-                        gap="4"
+                {currentPosts.length>0 ? 
+                    <>
+                        <Stack 
+                            display="flex" 
+                            flexDirection="row"
+                            alignItems="center"
+                            gap="4"
+                            >
+                            <Select 
+                                value={sort.sort_by}
+                                onChange={(e:any)=>handleSort(e,'sort_by')}>
+                                <option value="full_name">Full Name</option>
+                                <option value="updated">Updated</option>
+                                <option value="pushed">Pushed</option>
+                                <option value="created">Created</option>
+                            </Select>
+                            <Select 
+                                mt="0px !important"
+                                value={sort.order} 
+                                onChange={(e:any)=>handleSort(e,'order')}>
+                                <option value="asc">Ascending</option>
+                                <option value="desc">Decending</option>
+                            </Select>
+                        </Stack>
+                        <Pagination 
+                            totalPosts={props.data.length} 
+                            postsPerPage={postsPerPage} 
+                            paginate={paginate}
+                            setPostPerPage={(p:number)=>{
+                                setPostsPerPage(p)
+                                setCurrentPage(1)
+                            }}
+                            currentPage={currentPage}
+                        />
+                        <Stack 
+                            display="flex" 
+                            gap="1" 
+                            flexDirection="row" 
+                            alignItems="center" 
+                            flexWrap="wrap" 
+                            w="100%"
                         >
-                        <Select 
-                            placeholder='Sort by' 
-                            onChange={(e:any)=>handleSort(e,'sort_by')}>
-                            <option value="full_name">Full Name</option>
-                            <option value="updated">Updated</option>
-                            <option value="pushed">Pushed</option>
-                            <option value="created">Created</option>
-                        </Select>
-                        <Select 
-                            placeholder='Order by' 
-                            mt="0px !important" 
-                            onChange={(e:any)=>handleSort(e,'order')}>
-                            <option value="asc">Ascending</option>
-                            <option value="desc">Decending</option>
-                        </Select>
-                    </Stack>
+                            {currentPosts.map(x=>(
+                                <Block key={x.id} block={x} onClick={()=>props.onClick(x)} />
+                            ))}
+                        </Stack>
+                    </>
+                    : null
                 }
-                <Stack 
-                    display="flex" 
-                    gap="1" 
-                    flexDirection="row" 
-                    alignItems="center" 
-                    flexWrap="wrap" 
-                    w="100%"
-                >
-                    {currentPosts.map(x=>(
-                        <Block key={x.id} block={x} onClick={()=>props.onClick(x)} />
-                    ))}
-                </Stack>
-                <Stack 
-                    display="flex" 
-                    flexDirection="row" 
-                    justifyContent="center" 
-                    position="absolute" 
-                    bottom="100px"
-                    left="200px"
-                >
-                    <Pagination 
-                        totalPosts={props.data.length} 
-                        postsPerPage={postsPerPage} 
-                        paginate={paginate} 
-                    />
-                </Stack>
+                
             </>
             :
             <Text>{props.error}</Text>}

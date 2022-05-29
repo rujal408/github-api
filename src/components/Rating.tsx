@@ -6,20 +6,21 @@ interface Props{
     rating:number;
 }
 
-const Rating: React.FC<Props> = ({rating}) => {
-    const buttons:ReactNode[]=[];
+const Rating: React.FC<Props> = (props) => {
+    const {rating} = props
+    const buttons:ReactNode[] = [];
 
     for (let i = 1; i <= 5; i++) {
-		buttons.push(
-			<RatingButton key={i} fill={i <= rating} />
-		);
-	}
+      buttons.push(
+        <RatingButton key={i} fill={i <= rating} />
+      );
+	  }
 
-  return (
-    <Stack direction="row">
-      {buttons}
-    </Stack>
-  )
+    return (
+      <Stack direction="row">
+        {buttons}
+      </Stack>
+    )
 }
 
 export default Rating;
